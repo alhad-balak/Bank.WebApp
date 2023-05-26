@@ -1,9 +1,138 @@
 ﻿@page "/deposit"
+@inject ITransactionData _dbTransaction
+@inject SessionState state
+
 
 <PageTitle>Deposit</PageTitle>
+<div>
+    <h1>Deposit </h1>
+
+    <p>Enter the details to complete the transaction.</p>
+
+    <hr />
+    <br />
+    <Notification Message="@Message" Action="@action" />
+
+    <hr />
+
+    <EditForm Model="@tm" OnValidSubmit="SubmitData">
+        
+        <div class="mb-3">
+            <label for="exampleInputMode" class="form-label">Mode of Transaction</label>
+            <InputRadioGroup @bind-Value="TransactionID">
+                <div class="mb-3">
+                    <div class="form-check-inline form-check">
+                        <InputRadio Value="1" />ATM
+                    </div>
+                    <div class="form-check-inline form-check">
+                        <InputRadio Value="2" />Cheque
+                    </div>
+                    <div class="form-check-inline form-check">
+                        <InputRadio Value="3" />UPI
+                    </div>
+                    <div class="form-check-inline form-check">
+                        <InputRadio Value="4" />Cash
+                    </div>
+                    <div class="invalid-feedback">Choose Mode of Transaction</div>
+                </div>
+            </InputRadioGroup>
+            @if (!ValidMode)
+            {
+                <div class="form-text text-danger">
+                    Choose the Mode of Transaction!!
+                </div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label for="exampleInputAmount" class="form-label">Amount</label>
+            <input type="number" class="form-control" id="exampleInputAmount" aria-describedby="AmountHelp" @bind-value="@tm.Credit_amt" required>
+            @if (!ValidAmt)
+            {
+                <div class="form-text text-danger" id="AmountHelp">
+                    Enter a valid Amount
+                </div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <input type="checkbox" class="form-check-input" id="exampleTnC" describedby="TnCHelp" required>
+            <label class="form-check-label" for="exampleTnC">I agree to the Terms and Condition</label>
+            @*<div id="emailHelp" class="form-text">We'll never share your details with anyone else.</div>*@
+        </div>
 
 
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Transfer</button>
+        </div>
+    </EditForm>
+</div>
 
 @code {
 
+    TransactionModel tm = new TransactionModel();
+    bool ValidAmt = true;
+    bool ValidMode = true;
+
+
+
+    int TransactionID;
+    string action = "";
+    string Message = "";
+    string RepeatPassword = "";
+    private void SubmitData()
+    {
+
+        tm.User_name = state.UserName;
+        if(TransactionID==1)
+        {
+            tm.Trans_type = "ATM";
+            tm.Trans_id = "atmtyid";
+            TransactionID = 0;
+            ValidMode = true;
+        }
+        else if(TransactionID==2)
+        {
+            tm.Trans_type = "Cheque";
+            tm.Trans_id = "chequetyid";
+            TransactionID = 0;
+            ValidMode = true;
+        }
+        else if(TransactionID==3)
+        {
+            tm.Trans_type = "UPI";
+            tm.Trans_id = "upityid";
+            TransactionID = 0;
+            ValidMode = true;
+        }
+        else if(TransactionID==4)
+        {
+            tm.Trans_type = "Cash";
+            tm.Trans_id = "cashtyid";
+            TransactionID = 0;
+            ValidMode = true;
+        }
+        else
+        {
+            ValidMode = false;
+        }
+
+        if(ValidAmt && ValidMode)
+        {
+            Console.WriteLine(tm.Credit_amt);
+            Console.WriteLine(tm.Debit_amt);
+            Console.WriteLine(tm.Trans_id);
+            Console.WriteLine(tm.Trans_type);
+            Console.WriteLine(tm.User_name);
+            _dbTransaction.Deposit(tm);
+            action="success";
+            Message = "Congralutaion! Your Transaction has been successful.";
+            tm = new TransactionModel();
+        }
+        else
+        {
+            action = "error";
+            Message = "Your Transaction has been failed!";
+        }
+    }
 }

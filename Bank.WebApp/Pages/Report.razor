@@ -3,48 +3,125 @@
 <PageTitle>Report</PageTitle>
 
 @using Bank.WebApp.Data
-@inject WeatherForecastService ForecastService
+@inject ITransactionData _dbTransaction
+@inject SessionState state
 
 
 
-<h1>Summary </h1>
 
-<p>This component will showw the transaction you have done so far.</p>
-
-@if (forecasts == null)
+@if (TransactionList == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
+    <h1>Account Report </h1>
+    <hr />
+    <br />
+    <h2>Summary</h2>
+    <hr />
+
     <table class="table">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
+                <th>Current Balance</th>
+                <th>Total Debit</th>
+                <th>Total Credit</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            <tr>
+                <td>
+                    @foreach (var data in BalList)
+                    {
+                        @if (data.User_name == state.UserName)
+                        {
+                            @data.Balance
+                            break;
+                        }
+                    }
+                </td>
+                <td>
+                    @foreach (var data in DebitList)
+                    {
+                        @if (data.User_name == state.UserName)
+                        {
+                            @data.Balance
+                            break;
+                        }
+                    }
+                </td>
+                <td>
+                    @foreach (var data in CreditList)
+                    {
+                        @if (data.User_name == state.UserName)
+                        {
+                            @data.Balance
+                            break;
+                        }
+                    }
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <br />
+    <h4>Statement</h4>
+    <p>This component will show the transaction details you have done so far.</p>
+    <hr />
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>Username</th>
+                <th>Transfer at</th>
+                <th>Debit Amount</th>
+                <th>Credit Amount</th>
+                <th>Mode of Transaction</th>
+                <th>Mode ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var data in TransactionList)
             {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
+                @if (data.User_name == state.UserName)
+                {
+                    modeid = "dblksa" + @data.Trans_id + "2768skjb" + data.Type_id;
+                    <tr>
+                        <td>@data.Trans_id</td>
+                        <td>@data.User_name</td>
+                        <td>@data.Transfer_at</td>
+                        <td>@data.Debit_amt</td>
+                        <td>@data.Credit_amt</td>
+                        <td>@data.Trans_type</td>
+                        <td>@modeid</td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
 }
 
 @code {
-    private WeatherForecast[]? forecasts;
+    List<TransactionModel> TransactionList = new List<TransactionModel>();
+    TransactionModel tm = new TransactionModel();
+    TransactionModel obj = new TransactionModel();
 
-    protected override async Task OnInitializedAsync()
+    List<BalanceModel> BalList = new List<BalanceModel>();
+    List<BalanceModel> DebitList = new List<BalanceModel>();
+    List<BalanceModel> CreditList = new List<BalanceModel>();
+
+
+    string Check = "0";
+    string action = "SAVE";
+    string name = "";
+    string modeid = "";
+
+    protected override void OnParametersSet()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateOnly.FromDateTime(DateTime.Now));
+        BalList = _dbTransaction.LoadBalance();
+        CreditList = _dbTransaction.LoadTotalCredit();
+        DebitList = _dbTransaction.LoadTotalDebit();
+        TransactionList = _dbTransaction.LoadTransactionDetails();
     }
 }

@@ -1,6 +1,9 @@
 using Bank.WebApp.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using DataAccessLibrary;
+using DataAccessLibrary.Model;
+using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddSingleton<ISQLDataAccess, SQLDataAccess>();
+builder.Services.AddSingleton<IAdminData, AdminData>();
+builder.Services.AddSingleton<ITransactionData, TransactionData>();
+builder.Services.AddScoped<SessionState>();
+
+
 
 var app = builder.Build();
 

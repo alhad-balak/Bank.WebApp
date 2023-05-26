@@ -1,4 +1,8 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject SessionState state
+@inject NavigationManager myNav
+
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Bank.WebApp</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -10,13 +14,13 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         @*<div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Account
-            </NavLink>
+        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+        <span class="oi oi-home" aria-hidden="true"></span> Account
+        </NavLink>
         </div>*@
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                 Home
+            <NavLink class="nav-link" href="/Index" Match="NavLinkMatch.All">
+                Home
             </NavLink>
         </div>
         <div class="nav-item px-3">
@@ -40,6 +44,21 @@
             </NavLink>
         </div>
     </nav>
+    @if (state != null)
+    {
+        <nav class="flex-column-reverse">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="registeruser">
+                    Register
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link btn" @onclick="Logout">
+                    Logout
+                </NavLink>
+            </div>
+        </nav>
+    }
 </div>
 
 @code {
@@ -50,5 +69,12 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private void Logout()
+    {
+        state.UserName=null;
+        myNav.NavigateTo("/");
+
     }
 }

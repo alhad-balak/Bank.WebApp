@@ -3,6 +3,7 @@
 @namespace Bank.WebApp.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,8 +13,15 @@
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
     <link href="Bank.WebApp.styles.css" rel="stylesheet" />
-    <link rel="icon" type="image/png" href="favicon.png"/>
+    <link rel="icon" type="image/png" href="favicon.png" />
+
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+
+    <script type="text/javascript">
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+    </script>
 </head>
 <body>
     <component type="typeof(App)" render-mode="ServerPrerendered" />

@@ -1,0 +1,216 @@
+﻿@page "/registeruser"
+@inject ITransactionData _dbTransaction
+@inject SessionState state
+@inject IAdminData _dbadmin
+
+
+<PageTitle>Register</PageTitle>
+
+<div>
+    <h1>Register</h1>
+
+    <Notification Message="@Message" Action="@action" />
+
+    <hr />
+
+    <EditForm Model="@am" OnValidSubmit="SubmitData">
+        <div class="mb-3">
+            <label for="exampleInputName" class="form-label">Name</label>
+            <input type="text" class="form-control" id="exampleInputName" aria-describedby="NameHelp" @bind-value="@am.Name" required>
+            @if (validation.Name == "0")
+            {
+                <div class="form-text text-danger" id="NameHelp">
+                    Enter a valid name. It should be alphabet only.
+                </div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Email</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" @bind-value="@am.Email" required>
+            <div id="emailHelp" class="form-text">We'll never share your mail ID with anyone else.</div>
+            @if (validation.Email == "0")
+            {
+                <div class="form-text text-danger">
+                    Enter a valid Email.
+                </div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label for="exampleInputPhone" class="form-label">Phone Number</label>
+            <input type="number" class="form-control" id="exampleInputPhone" aria-describedby="PhoneHelp" @bind-value="@am.Phone_no" required>
+            <div id="PhoneHelp" class="form-text">We'll never share your number with anyone else.</div>
+            @if (validation.Phone_no == "0")
+            {
+                <div class="form-text text-danger">
+                    Enter a valid Phone Number. It should contain number only.
+                </div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label for="exampleInputGender" class="form-label">Gender</label>
+            <InputRadioGroup @bind-Value="GenderID">
+                <div class="mb-3">
+                    <div class="form-check-inline form-check">
+                        <InputRadio Value="1" />Male
+                    </div>
+                    <div class="form-check-inline form-check">
+                        <InputRadio Value="2" />Female
+                    </div>
+                    <div class="form-check-inline form-check">
+                        <InputRadio Value="3" />Other
+                    </div>
+                    <div class="invalid-feedback">Choose the Gender</div>
+
+                </div>
+            </InputRadioGroup>
+            @if (validation.Gender == "0")
+            {
+                <div class="form-text text-danger">
+                    Choose the your gender.
+                </div>
+            }
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputAddress" class="form-label">Address</label>
+            <input type="text" class="form-control" id="exampleInputAddress" aria-describedby="AddressHelp" @bind-value="@am.Address" required>
+            @if (validation.Address == "0")
+            {
+                <div class="form-text text-danger">
+                    Enter a valid Address
+                </div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label for="exampleInputPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" id="exampleInputPassword" aria-describedby="AddressHelp" @bind-value="@am.Password" required>
+            @*<div id="emailHelp" class="form-text">We'll never share your details with anyone else.</div>*@
+        </div>
+
+        <div class="mb-3">
+            <label for="exampleInputRepeatPassword" class="form-label">Repeat Password</label>
+            <input type="password" class="form-control" id="exampleInputRepeatPassword" aria-describedby="RepeatPasswordHelp" @onchange="(e)=>RepeatPassword=e.Value!.ToString()!" required>
+            @*<div id="emailHelp" class="form-text">We'll never share your details with anyone else.</div>*@
+            @if (validation.Password == "0")
+            {
+                <div class="form-text text-danger">
+                    Password doesn't match!
+                </div>
+            }
+        </div>
+
+
+        <div class="mb-3">
+            <input type="checkbox" class="form-check-input" id="exampleTnC" describedby="TnCHelp" required>
+            <label class="form-check-label" for="exampleTnC">I agree to the Terms and Condition</label>
+            @*<div id="emailHelp" class="form-text">We'll never share your details with anyone else.</div>*@
+        </div>
+
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Register</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    AdminModel am = new AdminModel();
+    AdminModel validation = new AdminModel();
+
+
+
+    int GenderID;
+    string action = "";
+    string Message = "";
+    string RepeatPassword = "";
+
+    private static bool IsValidMail(string email)
+    {
+        string regex = @"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$";
+
+        return Regex.IsMatch(email, regex, RegexOptions.IgnoreCase);
+    }
+    protected void SubmitData()
+    {
+        //Gender Validation
+        if (GenderID == 1)
+        {
+            validation.Gender = "1";
+            am.Gender = "Male";
+            GenderID = 0;
+        }
+        else if (GenderID == 2)
+        {
+            validation.Gender = "1";
+            am.Gender = "Female";
+            GenderID = 0;
+        }
+        else if (GenderID == 3)
+        {
+            validation.Gender = "1";
+            am.Gender = "Other";
+            GenderID = 0;
+        }
+        else
+            validation.Gender = "0";
+
+        //Password validation
+        if (am.Password == RepeatPassword)
+        {
+            validation.Password = "1";
+        }
+        else
+            validation.Password = "0";
+
+
+
+        //Address Validation
+        if (Regex.IsMatch(am.Address!, @"^[a-zA-Z0-9_/()]+$", RegexOptions.IgnoreCase))
+            validation.Address = "1";
+        else
+            validation.Address = "0";
+
+        //Name Validation
+        if (Regex.IsMatch(am.Name!, @"^[a-zA-Z]+$", RegexOptions.IgnoreCase))
+            validation.Name = "1";
+        else
+            validation.Name = "0";
+
+
+        //Email validation
+        if (IsValidMail(am.Email!))
+            validation.Email = "1";
+        else
+            validation.Email = "0";
+
+        //Phone Number Update
+        string TempPhone = "+91-";
+        TempPhone += am.Phone_no;
+        am.Phone_no = TempPhone;
+
+        //Set username
+        string[] tempUser = am.Email!.Split("@");
+        am.User_name = tempUser[0];
+
+        Console.WriteLine(am.User_name);
+        //Registration Validation & Query execution
+        if (validation.Name == "1" && validation.Address == "1" && validation.Email == "1" && validation.Password == "1" && validation.Gender == "1")
+        {
+            _dbadmin.insert(am);
+            //Console.WriteLine(Message);
+            Message = "Congratulations! User has been registered successfully!!";
+            action = "success";
+            am = new AdminModel();
+        }
+        else
+        {
+            action = "error";
+            Message = "Please enter the details carefully";
+        }
+    }
+}
+
+

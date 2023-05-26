@@ -1,9 +1,86 @@
 ﻿@page "/account"
+@inject ITransactionData _dbTransaction
+@inject SessionState state
+@inject IAdminData _Dbadmin
+
 
 <PageTitle>Account</PageTitle>
-<h3>Account</h3>
+<h1>Account Details</h1>
 
-<p> Here we'll show you your balance.</p>
+<p> Here we'll show you your account details.</p>
+
+@foreach (var data in balList)
+{
+    @if (data.User_name == state.UserName)
+    {
+        <h2>Balance: @data.Balance</h2>
+        break;
+    }
+}
+@if (BalanceBtn)
+{
+    <div class="mb-3">
+        <button class="btn btn-primary" type="submit" @onclick="ShowBalance">Show Balance</button>
+    </div>
+}
+
+<br />
+<hr />
+<br />
+<h2>Account Details</h2>
+
+<hr />
+<table class="table">
+    <thead>
+        @foreach (var data in adminlist)
+        {
+            @if (data.User_name == state.UserName)
+            {
+                <tr>
+                    <th>Username</th>
+                    <td>@data.User_name</td>
+                </tr>
+                <tr>
+                    <th>Name</th>
+                    <td>@data.Name</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>@data.Email</td>
+                </tr>
+                <tr>
+                    <th>Phone Number</th>
+                    <td>@data.Phone_no</td>
+                </tr>
+                <tr>
+                    <th>Gender</th>
+                    <td>@data.Gender</td>
+                </tr>
+                <tr>
+                    <th>Account created at</th>
+                    <td>@data.Created_at</td>
+                </tr>
+                <tr>
+                    <th>Address</th>
+                    <td>@data.Address</td>
+                </tr>
+            }
+        }
+    </thead>
+</table>
 @code {
+    bool BalanceBtn = true;
+    List<BalanceModel> balList = new List<BalanceModel>();
+    void ShowBalance()
+    {
+        BalanceBtn = false;
+        balList = _dbTransaction.LoadBalance();
+    }
 
+    static List<AdminModel> adminlist = new List<AdminModel>();
+
+    protected override void OnParametersSet()
+    {
+        adminlist = _Dbadmin.LoadData();
+    }
 }
